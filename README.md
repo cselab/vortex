@@ -1,4 +1,4 @@
-Install Basilisk and enter the source directory:
+Unpack [Basilisk](https://basilisk.fr) and enter the source directory:
 ```
 wget -q http://basilisk.fr/basilisk/basilisk.tar.gz
 tar zxf basilisk.tar.gz
