@@ -41,10 +41,9 @@ Generate PNG frames:
 python post.py
 ```
 
-Create a video:
+Create an animation:
 ```bash
-magick a.*.png a.mp4
+magick a.*.png img/a.gif
 ```
 
-Video: [img/a.mp4](img/a.mp4)
-# vortex
+![Vortex animation](img/a.gif)
