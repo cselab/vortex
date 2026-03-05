@@ -18,6 +18,7 @@ cp config.osx config
 Build and install `qcc`
 ```bash
 make ast && make qcc
+mkdir -p "$HOME/.local/bin"
 cp qcc "$HOME/.local/bin/"
 ```
 
