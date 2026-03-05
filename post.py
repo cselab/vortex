@@ -16,7 +16,7 @@ for attr_path in glob.glob("a.*.attr.raw"):
     assert n * n == ncells, f"ncells={ncells} is not a perfect square"
     fields = attr.reshape(n, n, nfields)
     omega, psi, ux, uy, uz  = fields.T
-    assert np.all(uz == 0), "uz contains non-zero bytes"
+    assert np.all(uz == 0), "uz contains non-zero"
     out_path = attr_path.with_suffix("").with_suffix(".png")
     plt.figure()
     plt.imshow(omega, origin="lower", cmap="jet")
