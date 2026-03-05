@@ -1,4 +1,3 @@
-#include "grid/quadtree.h"
 #include "navier-stokes/stream.h"
 #include "xdmf2d.h"
 
