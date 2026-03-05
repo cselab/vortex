@@ -39,7 +39,6 @@ event init(t = 0) {
 event xdmf_output(t += 1.0) {
   static int tid = 0;
   char prefix[FILENAME_MAX];
-  fields_stats();
   sprintf(prefix, "a.%06d", tid++);
   if (output_xdmf(t, {omega, psi}, {u}, prefix) != 0) {
     fprintf(stderr, "main.c: error: fail to dump: %s\n", prefix);
