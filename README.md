@@ -1,5 +1,3 @@
-Vortex example using Basilisk.
-
 Install Basilisk and enter the source directory:
 ```bash
 wget -q http://basilisk.fr/basilisk/basilisk.tar.gz
