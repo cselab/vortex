@@ -21,7 +21,7 @@ make ast && make qcc
 cp qcc "$HOME/.local/bin/"
 ```
 
-Build:
+Build `a.aut`:
 ```bash
 qcc -disable-dimensions main.c -O2 -lm
 ```
