@@ -40,9 +40,11 @@ Generate PNG frames:
 python post.py
 ```
 
-Create an animation with ImageMagic, comand can be `convert` in older versions:
+Create an animation with [ImageMagic](https://imagemagick.org), comand can be `convert` in older versions:
 ```
 magick a.*.png img/a.gif
 ```
 
-![Vortex animation](img/a.gif)
+<p align="center">
+  <img src="img/a.gif" alt="Vortex animation" width="480" />
+</p>
