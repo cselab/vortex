@@ -37,7 +37,7 @@ static int output_xdmf(double t, scalar *list, vector *vlist,
     ncell++;
     if (ncell >= nsize) {
       nsize = 2 * nsize + 1;
-      if ((xyz = realloc(xyz, 4 * 2 * nsize * sizeof *xyz)) == NULL) {
+      if ((xyz = realloc(xyz, 4 * 3 * nsize * sizeof *xyz)) == NULL) {
         fprintf(stderr, "%s:%d: realloc failed\n", __FILE__, __LINE__);
         return 1;
       }
@@ -45,6 +45,7 @@ static int output_xdmf(double t, scalar *list, vector *vlist,
     for (i = 0; i < 4; i++) {
       xyz[j++] = x + Delta * (shift[i][0] - 0.5);
       xyz[j++] = y + Delta * (shift[i][1] - 0.5);
+      xyz[j++] = 0;
     }
   }
 
@@ -53,15 +54,15 @@ static int output_xdmf(double t, scalar *list, vector *vlist,
     offset = 0;
   MPI_File_open(MPI_COMM_WORLD, xyz_path, MPI_MODE_CREATE | MPI_MODE_WRONLY,
                 MPI_INFO_NULL, &mpi_file);
-  MPI_File_write_at_all(mpi_file, 2 * 4 * offset * sizeof *xyz, xyz,
-                        2 * 4 * ncell * sizeof *xyz, MPI_BYTE,
+  MPI_File_write_at_all(mpi_file, 3 * 4 * offset * sizeof *xyz, xyz,
+                        3 * 4 * ncell * sizeof *xyz, MPI_BYTE,
                         MPI_STATUS_IGNORE);
   free(xyz);
   MPI_File_close(&mpi_file);
 
   nattr = list_len(list);
   nvect = vectors_len(vlist);
-  if ((attr = malloc((nattr + 2 * nvect) * ncell * sizeof *attr)) == NULL) {
+  if ((attr = malloc((nattr + 3 * nvect) * ncell * sizeof *attr)) == NULL) {
     fprintf(stderr, "%s:%d: malloc failed\n", __FILE__, __LINE__);
     return 1;
   }
@@ -73,13 +74,14 @@ static int output_xdmf(double t, scalar *list, vector *vlist,
     for (vector v in vlist) {
       attr[j++] = val(v.x);
       attr[j++] = val(v.y);
+      attr[j++] = 0;
     }
   }
-  assert(j == (nattr + 2 * nvect) * ncell);
+  assert(j == (nattr + 3 * nvect) * ncell);
   MPI_File_open(MPI_COMM_WORLD, attr_path, MPI_MODE_CREATE | MPI_MODE_WRONLY,
                 MPI_INFO_NULL, &mpi_file);
-  MPI_File_write_at_all(mpi_file, (nattr + 2 * nvect) * offset * sizeof *attr,
-                        attr, (nattr + 2 * nvect) * ncell * sizeof *attr,
+  MPI_File_write_at_all(mpi_file, (nattr + 3 * nvect) * offset * sizeof *attr,
+                        attr, (nattr + 3 * nvect) * ncell * sizeof *attr,
                         MPI_BYTE, MPI_STATUS_IGNORE);
   free(attr);
   MPI_File_close(&mpi_file);
@@ -103,7 +105,7 @@ static int output_xdmf(double t, scalar *list, vector *vlist,
             "          Dimensions=\"%ld\"/>\n"
             "      <Geometry>\n"
             "        <DataItem\n"
-            "            Dimensions=\"%ld 2\"\n"
+            "            Dimensions=\"%ld 3\"\n"
             "            Format=\"Binary\">\n"
             "          %s\n"
             "        </DataItem>\n"
@@ -129,8 +131,8 @@ static int output_xdmf(double t, scalar *list, vector *vlist,
               "          </DataItem>\n"
               "         </DataItem>\n"
               "      </Attribute>\n",
-              s.name, ncell_total, j++, nattr + 2 * nvect, ncell_total,
-              (nattr + 2 * nvect) * ncell_total, attr_base);
+              s.name, ncell_total, j++, nattr + 3 * nvect, ncell_total,
+              (nattr + 3 * nvect) * ncell_total, attr_base);
     for (vector v in vlist) {
       vname = strdup(v.x.name);
       *strrchr(vname, '.') = '\0';
@@ -141,12 +143,12 @@ static int output_xdmf(double t, scalar *list, vector *vlist,
               "          Center=\"Cell\">\n"
               "        <DataItem\n"
               "            ItemType=\"HyperSlab\"\n"
-              "            Dimensions=\"%ld 2\"\n"
+              "            Dimensions=\"%ld 3\"\n"
               "            Type=\"HyperSlab\">\n"
               "          <DataItem Dimensions=\"3 2\">\n"
               "            0 %ld\n"
               "            1 1\n"
-              "            %ld 2\n"
+              "            %ld 3\n"
               "          </DataItem>\n"
               "          <DataItem\n"
               "              Dimensions=\"%ld %ld\"\n"
@@ -156,9 +158,9 @@ static int output_xdmf(double t, scalar *list, vector *vlist,
               "         </DataItem>\n"
               "      </Attribute>\n",
               vname, ncell_total, j, ncell_total, ncell_total,
-              nattr + 2 * nvect, attr_base);
+              nattr + 3 * nvect, attr_base);
       free(vname);
-      j += 2;
+      j += 3;
     }
     fprintf(file, "    </Grid>\n"
                   "  </Domain>\n"
