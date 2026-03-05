@@ -1,10 +1,9 @@
 #include "grid/quadtree.h"
 #include "navier-stokes/stream.h"
-#include "diffusion.h"
 #include "xdmf2d.h"
 
-enum { level = 9 };
-static const double t_end = 30;
+enum { level = 8 };
+static const double t_end = 50;
 static const double core = 0.01;
 static double xc0, yc0, omg0, xc1, yc1, omg1;
 int main(int argc, char **argv) {
@@ -14,18 +13,18 @@ int main(int argc, char **argv) {
   argv++;
   for (i = 0; i < sizeof vals / sizeof *vals; i++) {
     if (*argv == NULL) {
-      fprintf(stderr, "main: error: not enough arguments\n");
+      fprintf(stderr, "main.c: error: not enough arguments\n");
       exit(1);
     }
     *vals[i] = strtod(*argv, &end);
     if (*end != '\0') {
-      fprintf(stderr, "main: error: '%s' is not a number\n", *argv);
+      fprintf(stderr, "main.c: error: '%s' is not a number\n", *argv);
       exit(1);
     }
     argv++;
   }
   if (*argv != NULL) {
-    fprintf(stderr, "main: error: unused argument: %s\n", *argv);
+    fprintf(stderr, "main.c: error: unused argument: %s\n", *argv);
     exit(1);
   }
   init_grid(1 << level);
@@ -42,6 +41,9 @@ event xdmf_output(t += 1.0) {
   char prefix[FILENAME_MAX];
   fields_stats();
   sprintf(prefix, "a.%06d", tid++);
-  output_xdmf(t, {omega}, {u}, NULL, prefix);
+  if (output_xdmf(t, {omega, psi}, {u}, prefix) != 0) {
+    fprintf(stderr, "main.c: error: fail to dump: %s\n", prefix);
+    exit(1);
+  }
 }
 event end(t = t_end) {}
