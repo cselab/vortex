@@ -21,8 +21,9 @@ static int output_xdmf(double t, scalar *list, vector *vlist,
                        const char *path) {
   float *xyz, *attr;
   long i, j, nattr, nvect, ncomp, ncell, ncell_total, nsize;
-  char xyz_path[FILENAME_MAX], attr_path[FILENAME_MAX], xdmf_path[FILENAME_MAX],
-      *vname, *xyz_base, *attr_base;
+  size_t path_len;
+  char *xyz_path = NULL, *attr_path = NULL, *xdmf_path = NULL;
+  char *vname, *xyz_base, *attr_base;
   FILE *file;
   xdmf_cell_record *records;
   const int shift[4][2] = {
@@ -32,18 +33,24 @@ static int output_xdmf(double t, scalar *list, vector *vlist,
       {1, 0},
   };
 
-  snprintf(xyz_path, sizeof xyz_path, "%s.xyz.raw", path);
-  snprintf(attr_path, sizeof attr_path, "%s.attr.raw", path);
-  snprintf(xdmf_path, sizeof xdmf_path, "%s.xdmf2", path);
-
-  xyz_base = xyz_path;
-  attr_base = attr_path;
-  for (j = 0; xyz_path[j] != '\0'; j++) {
-    if (xyz_path[j] == '/' && xyz_path[j + 1] != '\0') {
-      xyz_base = &xyz_path[j + 1];
-      attr_base = &attr_path[j + 1];
-    }
+  path_len = strlen(path);
+  if ((xyz_path = malloc(path_len + sizeof ".xyz.raw")) == NULL ||
+      (attr_path = malloc(path_len + sizeof ".attr.raw")) == NULL ||
+      (xdmf_path = malloc(path_len + sizeof ".xdmf2")) == NULL) {
+    free(xyz_path);
+    free(attr_path);
+    free(xdmf_path);
+    fprintf(stderr, "%s:%d: malloc failed\n", __FILE__, __LINE__);
+    return 1;
   }
+  snprintf(xyz_path, path_len + sizeof ".xyz.raw", "%s.xyz.raw", path);
+  snprintf(attr_path, path_len + sizeof ".attr.raw", "%s.attr.raw", path);
+  snprintf(xdmf_path, path_len + sizeof ".xdmf2", "%s.xdmf2", path);
+
+  xyz_base = strrchr(xyz_path, '/');
+  xyz_base = xyz_base ? xyz_base + 1 : xyz_path;
+  attr_base = strrchr(attr_path, '/');
+  attr_base = attr_base ? attr_base + 1 : attr_path;
 
   nattr = list_len(list);
   nvect = vectors_len(vlist);
@@ -253,5 +260,8 @@ static int output_xdmf(double t, scalar *list, vector *vlist,
             xdmf_path);
     return 1;
   }
+  free(xyz_path);
+  free(attr_path);
+  free(xdmf_path);
   return 0;
 }
