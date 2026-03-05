@@ -26,7 +26,7 @@ Build `a.aut`:
 qcc -disable-dimensions main.c -O2 -lm
 ```
 
-Run with parameters `xc0 yc0 omg0 xc1 yc1 omg1`:
+Run with parameters `xc0 yc0 omg0 xc1 yc1 omg1`; domain is `[0,1] x [0,1]`, and vortex strengths `omg0`, `omg1` can be negative.
 ```bash
 ./a.out 0.5 0.5 1.0 0.6 0.8 -1.0
 ```
