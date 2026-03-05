@@ -33,7 +33,8 @@ Run with parameters `xc0 yc0 omg0 xc1 yc1 omg1`:
 ./a.out 0.5 0.5 1.0 0.6 0.8 -1.0
 ```
 
-Output is written to `a.*.attr.raw`; to read it in Python, see `post.py`.
+`main.c` writes per-snapshot raw fields to `a.*.attr.raw`; `omega` is the first field in each record.
+`post.py` reads these files, writes per-snapshot images `a.*.png`, and creates `omegas.npy` with shape `(nsnap, n, n)`.
 
 Generate PNG frames:
 ```bash
@@ -46,3 +47,4 @@ magick a.*.png a.mp4
 ```
 
 Video: [img/a.mp4](img/a.mp4)
+# vortex
