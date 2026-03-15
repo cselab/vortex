@@ -4,36 +4,47 @@
 enum { level = 8 };
 static const double t_end = 50;
 static const double core = 0.01;
-static double xc0, yc0, omg0, xc1, yc1, omg1;
+static double *vals;
+static int nv;
 int main(int argc, char **argv) {
   int i;
   char *end;
-  double *vals[] = {&xc0, &yc0, &omg0, &xc1, &yc1, &omg1};
+  vals = NULL;
   argv++;
-  for (i = 0; i < sizeof vals / sizeof *vals; i++) {
-    if (*argv == NULL) {
-      fprintf(stderr, "main.c: error: not enough arguments\n");
+  for (nv = 0; *argv != NULL; nv++) {
+    vals = realloc(vals, 3 * (nv + 1) * sizeof *vals);
+    if (vals == NULL) {
+      fprintf(stderr, "main.c: error: realloc failed\n");
       exit(1);
     }
-    *vals[i] = strtod(*argv, &end);
-    if (*end != '\0') {
-      fprintf(stderr, "main.c: error: '%s' is not a number\n", *argv);
-      exit(1);
+    for (i = 0; i < 3; i++) {
+      if (*argv == NULL) {
+        fprintf(stderr, "main.c: error: wrong number of arguments\n");
+        exit(1);
+      }
+      vals[3 * nv + i] = strtod(*argv, &end);
+      if (*end != '\0') {
+        fprintf(stderr, "main.c: error: '%s' is not a number\n", *argv);
+        exit(1);
+      }
+      argv++;
     }
-    argv++;
-  }
-  if (*argv != NULL) {
-    fprintf(stderr, "main.c: error: unused argument: %s\n", *argv);
-    exit(1);
   }
   init_grid(1 << level);
   run();
 }
 event init(t = 0) {
-  foreach()
-    omega[] =
-      omg0 * exp(-(sq(x - xc0) + sq(y - yc0))/core) +
-      omg1 * exp(-(sq(x - xc1) + sq(y - yc1))/core);
+  foreach () {
+    double ans = 0;
+    for (int i = 0; i < nv; i++) {
+      double xc, yc, om;
+      xc = vals[3 * i];
+      yc = vals[3 * i + 1];
+      om = vals[3 * i + 2];
+      ans += om * exp(-(sq(x - xc) + sq(y - yc)) / core);
+    }
+    omega[] = ans;
+  }
 }
 event xdmf_output(t += 1.0) {
   static int tid = 0;
