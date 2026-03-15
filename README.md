@@ -27,9 +27,9 @@ Build `a.aut`:
 qcc -disable-dimensions main.c -O2 -lm
 ```
 
-Run with parameters `xc0 yc0 omg0 xc1 yc1 omg1`; domain is `[0,1] x [0,1]`, and vortex strengths `omg0`, `omg1` can be negative.
+Run with one or more vortices; each vortex is three numbers: `x y omg`. Domain is `[0,1] x [0,1]`; strength `omg` can be negative.
 ```
-./a.out 0.5 0.5 1.0 0.6 0.8 1.0
+./a.out 0.3 0.3 1.0  0.5 0.5 -0.5  0.7 0.4 1.0
 ```
 
 `main.c` writes per-snapshot raw fields to `a.*.attr.raw`; `omega` is the first field in each record.
