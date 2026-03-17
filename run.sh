@@ -2,7 +2,12 @@
 
 NPROC=$(nproc 2>/dev/null || sysctl -n hw.ncpu)
 
-for d in [0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]/
+test -x ./vortex || { echo "no ./vortex binary found" >&2; exit 1; }
+
+set -- [0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]/
+test -d "$1" || { echo "no job directories found" >&2; exit 1; }
+
+for d
 do if test ! -f $d/status
    then echo $d
    fi
