@@ -3,32 +3,41 @@
 
 enum { level = 8 };
 static const double t_end = 50;
-static const double core = 0.01;
+static const double mmz_q = 2.56085;
 static double *vals;
 static int nv;
+enum { NPAR = 6 };
 int main(int argc, char **argv) {
   int i;
   char *end;
   vals = NULL;
   argv++;
   for (nv = 0; *argv != NULL; nv++) {
-    vals = realloc(vals, 3 * (nv + 1) * sizeof *vals);
+    vals = realloc(vals, NPAR * (nv + 1) * sizeof *vals);
     if (vals == NULL) {
-      fprintf(stderr, "main.c: error: realloc failed\n");
+      fprintf(stderr, "ellipses.c: error: realloc failed\n");
       exit(1);
     }
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < NPAR; i++) {
       if (*argv == NULL) {
-        fprintf(stderr, "main.c: error: wrong number of arguments\n");
+        fprintf(stderr,
+                "ellipses.c: error: wrong number of arguments\n"
+                "usage: x y om ax ay ang [x y om ax ay ang ...]\n");
         exit(1);
       }
-      vals[3 * nv + i] = strtod(*argv, &end);
+      vals[NPAR * nv + i] = strtod(*argv, &end);
       if (*end != '\0') {
-        fprintf(stderr, "main.c: error: '%s' is not a number\n", *argv);
+        fprintf(stderr, "ellipses.c: error: '%s' is not a number\n", *argv);
         exit(1);
       }
       argv++;
     }
+  }
+  if (nv == 0) {
+    fprintf(stderr,
+            "ellipses.c: error: no ellipses given\n"
+            "usage: x y om ax ay ang [x y om ax ay ang ...]\n");
+    exit(1);
   }
   init_grid(1 << level);
   run();
@@ -37,11 +46,22 @@ event init(t = 0) {
   foreach () {
     double ans = 0;
     for (int i = 0; i < nv; i++) {
-      double xc, yc, om;
-      xc = vals[3 * i];
-      yc = vals[3 * i + 1];
-      om = vals[3 * i + 2];
-      ans += om * exp(-(sq(x - xc) + sq(y - yc)) / core);
+      double xc = vals[NPAR * i];
+      double yc = vals[NPAR * i + 1];
+      double om = vals[NPAR * i + 2];
+      double ax = vals[NPAR * i + 3];
+      double ay = vals[NPAR * i + 4];
+      double ang = vals[NPAR * i + 5];
+      double cs = cos(ang), sn = sin(ang);
+      double dx = x - xc, dy = y - yc;
+      double u = cs * dx + sn * dy;
+      double v = -sn * dx + cs * dy;
+      double r2 = sq(u / ax) + sq(v / ay);
+      if (r2 <= 1) {
+        double r = sqrt(r2);
+        double fq = exp(-(mmz_q / r) * exp(1.0 / (r - 1)));
+        ans += om * (1 - fq);
+      }
     }
     omega[] = ans;
   }
@@ -51,7 +71,7 @@ event xdmf_output(t += 1.0) {
   char prefix[FILENAME_MAX];
   sprintf(prefix, "a.%06d", tid++);
   if (output_xdmf(t, {omega, psi}, {u}, prefix) != 0) {
-    fprintf(stderr, "main.c: error: fail to dump: %s\n", prefix);
+    fprintf(stderr, "ellipses.c: error: fail to dump: %s\n", prefix);
     exit(1);
   }
 }
