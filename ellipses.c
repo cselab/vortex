@@ -1,7 +1,7 @@
 #include "navier-stokes/stream.h"
 #include "xdmf2d.h"
 
-enum { level = 8 };
+enum { level = 10 };
 static const double t_end = 200;
 static double *vals;
 static int nv;
