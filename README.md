@@ -45,6 +45,14 @@ Create an animation with [ImageMagic](https://imagemagick.org), comand can be `c
 magick a.*.png img/a.gif
 ```
 
+```
+./ellipses \
+   0.5 0.65 1 0.15 0.035 0 \
+   0.5 0.35 1 0.15 0.035 0 \
+   0.65 0.5 1 0.035 0.15 0 \
+   0.35 0.5 1 0.035 0.15 0
+```
+
 <p align="center">
   <img src="img/a.gif" alt="Vortex animation" width="480" />
 </p>

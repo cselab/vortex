@@ -3,7 +3,6 @@
 
 enum { level = 8 };
 static const double t_end = 50;
-static const double mmz_q = 2.56085;
 static double *vals;
 static int nv;
 enum { NPAR = 6 };
@@ -57,11 +56,7 @@ event init(t = 0) {
       double u = cs * dx + sn * dy;
       double v = -sn * dx + cs * dy;
       double r2 = sq(u / ax) + sq(v / ay);
-      if (r2 <= 1) {
-        double r = sqrt(r2);
-        double fq = exp(-(mmz_q / r) * exp(1.0 / (r - 1)));
-        ans += om * (1 - fq);
-      }
+      ans += om * exp(-r2);
     }
     omega[] = ans;
   }
