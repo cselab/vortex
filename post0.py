@@ -6,15 +6,16 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 
 cmap_data = [
-    (0.00, (0.78, 0.76, 0.74)),  # warm gray (zero)
-    (0.05, (0.45, 0.43, 0.41)),  # dark gray
-    (0.12, (0.15, 0.15, 0.15)),  # near black
-    (0.20, (0.0, 0.1, 0.3)),     # dark navy
-    (0.30, (0.0, 0.5, 0.8)),     # cyan-blue
-    (0.38, (0.7, 0.0, 0.0)),     # red
-    (0.55, (0.9, 0.3, 0.0)),     # orange
-    (0.75, (1.0, 0.7, 0.0)),     # yellow-orange
-    (1.00, (1.0, 0.9, 0.3)),     # bright yellow
+    (0.00, (0.78, 0.78, 0.75)),   # gray background (200,198,190)
+    (0.04, (0.55, 0.54, 0.52)),   # mid gray
+    (0.10, (0.09, 0.09, 0.08)),   # near black (23,22,21)
+    (0.15, (0.21, 0.48, 0.65)),   # dark blue (53,122,167)
+    (0.18, (0.49, 0.65, 0.74)),   # light cyan (124,165,189)
+    (0.22, (0.60, 0.19, 0.07)),   # dark red (154,48,18)
+    (0.30, (0.68, 0.16, 0.02)),   # red (173,42,4)
+    (0.45, (0.79, 0.30, 0.02)),   # orange (202,76,4)
+    (0.65, (0.78, 0.47, 0.00)),   # dark yellow (198,120,0)
+    (1.00, (0.78, 0.64, 0.00)),   # yellow (198,164,0)
 ]
 cmap_vortex = LinearSegmentedColormap.from_list(
     "vortex", [(p, c) for p, c in cmap_data]
@@ -49,9 +50,14 @@ for isnap, attr_path in enumerate(paths):
     uz = fields[:, :, 4]
     assert np.all(uz == 0), "uz contains non-zero"
     omegas[isnap, :, :] = omega
+    if isnap == 0:
+        vmax0 = 1.0
+
+for isnap, attr_path in enumerate(paths):
+    omega = omegas[isnap, :, :]
     out_path = attr_path.with_suffix("").with_suffix(".png")
     fig, ax = plt.subplots(1, 1, frameon=False)
     ax.set_axis_off()
-    ax.imshow(omega, origin="lower", cmap=cmap_vortex)
+    ax.imshow(omega, origin="lower", cmap=cmap_vortex, vmin=0, vmax=vmax0)
     fig.savefig(out_path, bbox_inches="tight", pad_inches=0, dpi=150)
     plt.close(fig)
