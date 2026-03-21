@@ -3,26 +3,34 @@ import numpy as np
 import glob
 from pathlib import Path
 import matplotlib.pyplot as plt
-from matplotlib.colors import LinearSegmentedColormap
+from matplotlib.colors import LinearSegmentedColormap, PowerNorm
 
 cmap_data = [
-    (0.00, (0.78, 0.78, 0.75)),   # gray background (200,198,190)
-    (0.005,(0.70, 0.69, 0.66)),   # barely off gray
-    (0.02, (0.55, 0.54, 0.52)),   # subtle shadow
-    (0.05, (0.35, 0.34, 0.33)),   # medium shadow
-    (0.10, (0.17, 0.17, 0.16)),   # dark shadow
-    (0.14, (0.09, 0.09, 0.08)),   # near black
-    (0.17, (0.21, 0.48, 0.65)),   # dark blue (53,122,167)
-    (0.20, (0.49, 0.65, 0.74)),   # light cyan (124,165,189)
-    (0.24, (0.60, 0.19, 0.07)),   # dark red (154,48,18)
-    (0.32, (0.68, 0.16, 0.02)),   # red (173,42,4)
-    (0.45, (0.79, 0.30, 0.02)),   # orange (202,76,4)
-    (0.65, (0.78, 0.47, 0.00)),   # dark yellow (198,120,0)
-    (1.00, (0.78, 0.64, 0.00)),   # yellow (198,164,0)
+    (0.00, (0.55, 0.54, 0.52)),   # slight shadow
+    (0.08, (0.30, 0.30, 0.29)),   # darker shadow
+    (0.14, (0.09, 0.09, 0.08)),   # dark
+    (0.18, (0.21, 0.48, 0.65)),   # dark blue
+    (0.21, (0.16, 0.54, 0.73)),   # medium blue
+    (0.24, (0.47, 0.63, 0.74)),   # light cyan
+    (0.27, (0.70, 0.67, 0.60)),   # near-white transition
+    (0.30, (0.60, 0.12, 0.02)),   # dark red
+    (0.34, (0.55, 0.05, 0.00)),   # deep red
+    (0.38, (0.63, 0.10, 0.00)),   # red
+    (0.42, (0.68, 0.16, 0.02)),   # bright red
+    (0.48, (0.74, 0.24, 0.00)),   # red-orange
+    (0.54, (0.77, 0.30, 0.00)),   # orange
+    (0.60, (0.78, 0.38, 0.01)),   # dark amber
+    (0.67, (0.78, 0.42, 0.01)),   # amber
+    (0.74, (0.77, 0.53, 0.00)),   # light amber
+    (0.82, (0.78, 0.58, 0.00)),   # dark yellow
+    (0.90, (0.78, 0.61, 0.00)),   # medium yellow
+    (0.96, (0.78, 0.63, 0.00)),   # yellow
+    (1.00, (0.78, 0.64, 0.00)),   # bright yellow
 ]
 cmap_vortex = LinearSegmentedColormap.from_list(
     "vortex", [(p, c) for p, c in cmap_data]
 )
+cmap_vortex.set_under((0.78, 0.78, 0.75))  # gray background
 
 paths = [Path(p) for p in sorted(glob.glob("a.*.attr.raw"))]
 assert paths, "no input files matching a.*.attr.raw"
@@ -53,14 +61,9 @@ for isnap, attr_path in enumerate(paths):
     uz = fields[:, :, 4]
     assert np.all(uz == 0), "uz contains non-zero"
     omegas[isnap, :, :] = omega
-    if isnap == 0:
-        vmax0 = 1.0
-
-for isnap, attr_path in enumerate(paths):
-    omega = omegas[isnap, :, :]
     out_path = attr_path.with_suffix("").with_suffix(".png")
     fig, ax = plt.subplots(1, 1, frameon=False)
     ax.set_axis_off()
-    ax.imshow(omega, origin="lower", cmap=cmap_vortex, vmin=0, vmax=vmax0)
-    fig.savefig(out_path, bbox_inches="tight", pad_inches=0, dpi=150)
+    ax.imshow(omega, origin="lower", cmap=cmap_vortex, vmin=0.01, vmax=1.0)
+    fig.savefig(out_path, bbox_inches="tight", pad_inches=0, dpi=300)
     plt.close(fig)

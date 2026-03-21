@@ -2,7 +2,7 @@
 #include "xdmf2d.h"
 
 enum { level = 10 };
-static const double t_end = 200;
+static const double t_end = 400;
 static double *vals;
 static int nv;
 enum { NPAR = 6 };
