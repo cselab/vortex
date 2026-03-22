@@ -11,7 +11,7 @@ assert omega.ndim == 3, f"expected (nsnap, n, n), got {omega.shape}"
 nsnap = omega.shape[0]
 i = max(0, min(args.i, nsnap - 1))
 plt.figure()
-plt.imshow(omega[args.i], origin="lower", cmap=args.cmap)
+plt.imshow(omega[i], origin="lower", cmap=args.cmap)
 plt.colorbar(label="omega")
 plt.title(f"{args.path}  snapshot {i}/{nsnap-1}")
 plt.tight_layout()
