@@ -32,6 +32,7 @@ int main(int argc, char **argv) {
   }
   init_grid(1 << level);
   run();
+  free(vals);
 }
 event init(t = 0) {
   foreach () {
