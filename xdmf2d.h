@@ -72,6 +72,9 @@ static int output_xdmf(double t, scalar *list, vector *vlist,
         for (i = 0; i < ncell; i++)
           free(records[i].attr);
         free(records);
+        free(xyz_path);
+        free(attr_path);
+        free(xdmf_path);
         return 1;
       }
       records = tmp;
@@ -85,6 +88,9 @@ static int output_xdmf(double t, scalar *list, vector *vlist,
       for (i = 0; i < ncell; i++)
         free(records[i].attr);
       free(records);
+      free(xyz_path);
+      free(attr_path);
+      free(xdmf_path);
       return 1;
     }
 
@@ -115,6 +121,9 @@ static int output_xdmf(double t, scalar *list, vector *vlist,
     for (i = 0; i < ncell; i++)
       free(records[i].attr);
     free(records);
+    free(xyz_path);
+    free(attr_path);
+    free(xdmf_path);
     return 1;
   }
   if ((attr = malloc(ncomp * ncell * sizeof *attr)) == NULL) {
@@ -123,6 +132,9 @@ static int output_xdmf(double t, scalar *list, vector *vlist,
     for (i = 0; i < ncell; i++)
       free(records[i].attr);
     free(records);
+    free(xyz_path);
+    free(attr_path);
+    free(xdmf_path);
     return 1;
   }
 
@@ -137,6 +149,9 @@ static int output_xdmf(double t, scalar *list, vector *vlist,
     fprintf(stderr, "%s:%d: fail to open '%s'\n", __FILE__, __LINE__, xyz_path);
     free(xyz);
     free(attr);
+    free(xyz_path);
+    free(attr_path);
+    free(xdmf_path);
     return 1;
   }
   if (fwrite(xyz, sizeof *xyz, 3 * 4 * ncell, file) !=
@@ -145,6 +160,9 @@ static int output_xdmf(double t, scalar *list, vector *vlist,
     fclose(file);
     free(xyz);
     free(attr);
+    free(xyz_path);
+    free(attr_path);
+    free(xdmf_path);
     return 1;
   }
   if (fclose(file) != 0) {
@@ -152,6 +170,9 @@ static int output_xdmf(double t, scalar *list, vector *vlist,
             xyz_path);
     free(xyz);
     free(attr);
+    free(xyz_path);
+    free(attr_path);
+    free(xdmf_path);
     return 1;
   }
 
@@ -159,6 +180,9 @@ static int output_xdmf(double t, scalar *list, vector *vlist,
     fprintf(stderr, "%s:%d: fail to open '%s'\n", __FILE__, __LINE__, attr_path);
     free(xyz);
     free(attr);
+    free(xyz_path);
+    free(attr_path);
+    free(xdmf_path);
     return 1;
   }
   if (fwrite(attr, sizeof *attr, ncomp * ncell, file) !=
@@ -167,6 +191,9 @@ static int output_xdmf(double t, scalar *list, vector *vlist,
     fclose(file);
     free(xyz);
     free(attr);
+    free(xyz_path);
+    free(attr_path);
+    free(xdmf_path);
     return 1;
   }
   if (fclose(file) != 0) {
@@ -174,6 +201,9 @@ static int output_xdmf(double t, scalar *list, vector *vlist,
             attr_path);
     free(xyz);
     free(attr);
+    free(xyz_path);
+    free(attr_path);
+    free(xdmf_path);
     return 1;
   }
   free(xyz);
@@ -182,6 +212,9 @@ static int output_xdmf(double t, scalar *list, vector *vlist,
   ncell_total = ncell;
   if ((file = fopen(xdmf_path, "w")) == NULL) {
     fprintf(stderr, "%s:%d: fail to open '%s'\n", __FILE__, __LINE__, xdmf_path);
+    free(xyz_path);
+    free(attr_path);
+    free(xdmf_path);
     return 1;
   }
   fprintf(file,
@@ -226,7 +259,19 @@ static int output_xdmf(double t, scalar *list, vector *vlist,
             ncomp * ncell_total, attr_base);
   for (vector v in vlist) {
     vname = strdup(v.x.name);
-    *strrchr(vname, '.') = '\0';
+    if (vname == NULL) {
+      fprintf(stderr, "%s:%d: strdup failed\n", __FILE__, __LINE__);
+      fclose(file);
+      free(xyz_path);
+      free(attr_path);
+      free(xdmf_path);
+      return 1;
+    }
+    {
+      char *dot = strrchr(vname, '.');
+      if (dot != NULL)
+        *dot = '\0';
+    }
     fprintf(file,
             "      <Attribute\n"
             "          Name=\"%s\"\n"
@@ -258,6 +303,9 @@ static int output_xdmf(double t, scalar *list, vector *vlist,
   if (fclose(file) != 0) {
     fprintf(stderr, "%s:%d: error: fail to close '%s'\n", __FILE__, __LINE__,
             xdmf_path);
+    free(xyz_path);
+    free(attr_path);
+    free(xdmf_path);
     return 1;
   }
   free(xyz_path);
