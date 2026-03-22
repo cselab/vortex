@@ -64,6 +64,6 @@ for isnap, attr_path in enumerate(paths):
     out_path = attr_path.with_suffix("").with_suffix(".png")
     fig, ax = plt.subplots(1, 1, frameon=False)
     ax.set_axis_off()
-    ax.imshow(omega, origin="lower", cmap=cmap_vortex, vmin=0.01, vmax=1.0)
+    ax.imshow(omega, origin="lower", cmap=cmap_vortex, vmin=0.01, vmax=1)
     fig.savefig(out_path, bbox_inches="tight", pad_inches=0, dpi=300)
     plt.close(fig)
